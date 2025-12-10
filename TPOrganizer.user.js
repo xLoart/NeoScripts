@@ -1,14 +1,16 @@
 // ==UserScript==
 // @name         TP Beautify
 // @namespace    Loart
-// @version      6.9420
+// @version      6.9420.1
 // @description  Unfuck the trading post
 // @author       Loart
 // @match        https://www.neopets.com/island/tradingpost.phtml*
+// @updateURL    https://github.com/xLoart/NeoScripts/raw/refs/heads/main/TPOrganizer.user.js
+// @downloadURL  https://github.com/xLoart/NeoScripts/raw/refs/heads/main/TPOrganizer.user.js
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
-
+//Hopefully unfucks a bunch of the TP
 (function() {
     'use strict';
 
