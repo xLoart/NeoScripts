@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TP Beautify
 // @namespace    Loart
-// @version      6.9420.1
+// @version      6.9420.2
 // @description  Unfuck the trading post
 // @author       Loart
 // @match        https://www.neopets.com/island/tradingpost.phtml*
@@ -10,7 +10,7 @@
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
-//Hopefully unfucks a bunch of the TP
+
 (function() {
     'use strict';
 
@@ -272,7 +272,14 @@
         });
     });
 
-    popupObserver.observe(document.body, { childList: true, subtree: true });
+    function startPopupObserver() {
+        if (document.body) {
+            popupObserver.observe(document.body, { childList: true, subtree: true });
+        } else {
+            setTimeout(startPopupObserver, 100);
+        }
+    }
+    startPopupObserver();
 
     function finalize(grid, data) {
         const container = document.createElement('div');
@@ -324,8 +331,12 @@
     const obs2 = new MutationObserver(check);
     const findContainer = () => {
         const el = document.querySelector('#app, #container__2020, .tp-main-content');
-        if (el) {
-            obs2.observe(el, { childList: true, subtree: true });
+        if (el && el.isConnected) {
+            try {
+                obs2.observe(el, { childList: true, subtree: true });
+            } catch (e) {
+                setTimeout(findContainer, 500);
+            }
         } else {
             setTimeout(findContainer, 500);
         }
