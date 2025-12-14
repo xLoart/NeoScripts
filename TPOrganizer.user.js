@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TP Beautify
 // @namespace    Loart
-// @version      6.9420.2
+// @version      6.9420.3
 // @description  Unfuck the trading post
 // @author       Loart
 // @match        https://www.neopets.com/island/tradingpost.phtml*
@@ -128,9 +128,10 @@
         <p class="text-[15px] font-bold">Wishlist:</p><p class="text-museo-bold text-[15px] break-words">${wishlist}</p>`;
         bottom.appendChild(wish);
 
-        if (instantPrice) {
+       
             const priceBox = document.createElement('div');
             priceBox.className = 'bg-white rounded-[12px] p-2';
+             if (instantPrice) {
             priceBox.innerHTML = `
                 <div class="flex justify-between bg-[#FFEBC6] items-center p-[8px] rounded-[7px]">
                     <p class="text-[16px]">Instant Buy</p>
@@ -139,6 +140,7 @@
                         <p class="text-museo-bold text-[16px]">${instantPrice}</p>
                     </div>
                 </div>`;
+             }
 
             if (origBuyBtn) {
                 const buyBtn = document.createElement('button');
@@ -159,7 +161,7 @@
             }
 
             bottom.appendChild(priceBox);
-        }
+        
 
         box.appendChild(itemBox);
         box.appendChild(bottom);
