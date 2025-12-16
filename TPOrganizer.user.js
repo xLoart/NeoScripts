@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TP Beautify
 // @namespace    Loart
-// @version      6.9420.3
+// @version      6.9420.4
 // @description  Unfuck the trading post
 // @author       Loart
 // @match        https://www.neopets.com/island/tradingpost.phtml*
@@ -91,80 +91,82 @@
         const ownerUrl = ownerLink?.href || '#';
         const bg = window.getComputedStyle(origCard).backgroundColor;
         const wishlist = origCard.querySelector('.wishlist-text')?.textContent || 'none';
-        const instantPrice = origCard.querySelector('.bg-\\[\\#FFEBC6\\]')?.querySelector('.text-museo-bold')?.textContent || '';
+        const instantPrice = origCard.querySelector('.bg-\\[\\#CBCCEA\\]')?.querySelector('.text-museo-bold')?.textContent || '';
         const origBuyBtn = origCard.querySelector('.button-classic-default');
         const origOfferBtn = origCard.querySelector('.button-classic-primary');
 
         const box = document.createElement('div');
-        box.className = 'w-full mb-4 tp-border-frame';
+        box.className = 'w-full mb-1 tp-border-frame flex items-center gap-2';
         box.style.backgroundColor = bg;
-        box.style.padding = '12px';
+        box.style.padding = '6px';
 
-        const grid = document.createElement('div');
-        grid.className = 'grid grid-cols-10 gap-3 p-3';
+        const itemsContainer = document.createElement('div');
+        itemsContainer.className = 'flex flex-wrap gap-2 min-w-0 flex-grow content-start';
         items.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'flex flex-col items-center';
-            const rarityHTML = item.rarity ? `<p class="text-center text-museo text-[12px] !text-[#E86060] mt-[-2px]">${item.rarity}</p>` : '';
-            div.innerHTML = `${item.imgHTML}<p class="text-center text-museo-bold text-[14px] mt-1">${item.name}</p>${rarityHTML}`;
+            div.className = 'flex-shrink-0 text-center';
+            div.style.width = '65px';
+            const rarityHTML = item.rarity ? `<p class="text-museo text-[10px] !text-[#E86060] break-words">${item.rarity}</p>` : '';
+            div.innerHTML = `${item.imgHTML}<p class="text-museo-bold text-[11px] break-words mt-0.5">${item.name}</p>${rarityHTML}`;
             const img = div.querySelector('img');
-            if (img) img.className = 'h-[64px] w-[64px]';
-            grid.appendChild(div);
+            if (img) {
+                img.className = 'h-[40px] w-[40px] mx-auto';
+                const relativeContainer = img.closest('.relative');
+                if (relativeContainer) {
+                    relativeContainer.style.width = '40px';
+                    relativeContainer.style.height = '40px';
+                    relativeContainer.style.margin = '0 auto';
+                    const quantityBadge = relativeContainer.querySelector('.item-count, div[class*="item-count"]');
+                    if (quantityBadge) {
+                        quantityBadge.style.right = '0';
+                        quantityBadge.style.bottom = '0';
+                    }
+                }
+            }
+            itemsContainer.appendChild(div);
         });
 
-        const itemBox = document.createElement('div');
-        itemBox.className = 'rounded-[12px] bg-white';
-        itemBox.appendChild(grid);
+        const infoSection = document.createElement('div');
+        infoSection.className = 'flex-shrink-0 bg-white rounded-[8px] p-1.5';
+        infoSection.style.width = '200px';
+        infoSection.innerHTML = `
+            <p class="text-black text-[14px] font-bold">${lotNum} - <a class="!text-[#02301F] !no-underline text-[13px]" href="${ownerUrl}">${owner}</a></p>
+            <p class="text-[13px]"><span class="font-bold">Wishlist:</span> <span class="text-museo-bold">${wishlist}</span></p>
+        `;
 
-        const bottom = document.createElement('div');
-        bottom.className = 'flex gap-3 items-start mt-2';
+        const buttonsSection = document.createElement('div');
+        buttonsSection.className = 'flex flex-col gap-1 flex-shrink-0';
 
-        const wish = document.createElement('div');
-        wish.className = 'bg-white rounded-[12px] p-2 flex-grow';
-        wish.innerHTML = ` <p class="text-black text-cafeteria text-[17px] font-bold">${lotNum} -
-            <a class="!text-[#02301F] !no-underline text-cafeteria text-[15px]" href="${ownerUrl}">
-                (owned by <span class="text-[#02301F] cursor-pointer">${owner}</span>)
-            </a></p>
-        <p class="text-[15px] font-bold">Wishlist:</p><p class="text-museo-bold text-[15px] break-words">${wishlist}</p>`;
-        bottom.appendChild(wish);
+        if (instantPrice) {
+            const priceLabel = document.createElement('p');
+            priceLabel.className = 'text-[12px] text-center bg-[#CBCCEA] px-2 py-0.5 rounded';
+            priceLabel.innerHTML = `<span class="font-bold">${instantPrice}</span>`;
+            buttonsSection.appendChild(priceLabel);
+        }
 
-       
-            const priceBox = document.createElement('div');
-            priceBox.className = 'bg-white rounded-[12px] p-2';
-             if (instantPrice) {
-            priceBox.innerHTML = `
-                <div class="flex justify-between bg-[#FFEBC6] items-center p-[8px] rounded-[7px]">
-                    <p class="text-[16px]">Instant Buy</p>
-                    <div class="flex gap-1 items-center">
-                        <img src="https://images.neopets.com/tradingpost/assets/images/np-icon.png" class="w-[24px] h-[24px]">
-                        <p class="text-museo-bold text-[16px]">${instantPrice}</p>
-                    </div>
-                </div>`;
-             }
+        if (origBuyBtn) {
+            const buyBtn = document.createElement('button');
+            buyBtn.className = 'button-classic-default tp-classic-button cursor-pointer px-2 py-1';
+            buyBtn.style.height = '28px';
+            buyBtn.style.minWidth = '100px';
+            buyBtn.innerHTML = '<p class="text-white text-[13px]">Instant Buy</p>';
+            buyBtn.onclick = e => { e.preventDefault(); origBuyBtn.click(); };
+            buttonsSection.appendChild(buyBtn);
+        }
 
-            if (origBuyBtn) {
-                const buyBtn = document.createElement('button');
-                buyBtn.className = 'button-classic-default tp-classic-button relative cursor-pointer px-4 py-2';
-                buyBtn.style.height = '45px';
-                buyBtn.innerHTML = '<p class="text-white text-cafeteria">Instant Buy</p>';
-                buyBtn.onclick = e => { e.preventDefault(); origBuyBtn.click(); };
-                priceBox.appendChild(buyBtn);
-            }
+        if (origOfferBtn) {
+            const offerBtn = document.createElement('button');
+            offerBtn.className = 'button-classic-primary tp-classic-button cursor-pointer px-2 py-1';
+            offerBtn.style.height = '28px';
+            offerBtn.style.minWidth = '100px';
+            offerBtn.innerHTML = '<p class="text-white text-[13px]">Make Offer</p>';
+            offerBtn.onclick = e => { e.preventDefault(); origOfferBtn.click(); };
+            buttonsSection.appendChild(offerBtn);
+        }
 
-            if (origOfferBtn) {
-                const offerBtn = document.createElement('button');
-                offerBtn.className = 'button-classic-primary tp-classic-button relative cursor-pointer px-4 py-2';
-                offerBtn.style.height = '45px';
-                offerBtn.innerHTML = '<p class="text-white text-cafeteria">Make an Offer</p>';
-                offerBtn.onclick = e => { e.preventDefault(); origOfferBtn.click(); };
-                priceBox.appendChild(offerBtn);
-            }
-
-            bottom.appendChild(priceBox);
-        
-
-        box.appendChild(itemBox);
-        box.appendChild(bottom);
+        box.appendChild(itemsContainer);
+        box.appendChild(infoSection);
+        box.appendChild(buttonsSection);
 
         return box;
     }
@@ -285,7 +287,28 @@
 
     function finalize(grid, data) {
         const container = document.createElement('div');
-        container.className = 'flex flex-col pt-[32px] px-4';
+        container.className = 'flex flex-col pt-[16px] px-2';
+
+        const paginationBottom = document.querySelector('.p-4.flex.justify-center.mt-4');
+        if (paginationBottom) {
+            const paginationTop = paginationBottom.cloneNode(true);
+            paginationTop.classList.remove('mt-4');
+            paginationTop.classList.add('mb-4');
+
+            const clonedButtons = paginationTop.querySelectorAll('button');
+            const originalButtons = paginationBottom.querySelectorAll('button');
+            clonedButtons.forEach((clonedBtn, index) => {
+                if (originalButtons[index]) {
+                    clonedBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        originalButtons[index].click();
+                    });
+                }
+            });
+
+            container.appendChild(paginationTop);
+        }
+
         data.forEach(d => container.appendChild(buildLot(d.lot, d.items)));
         grid.parentNode.insertBefore(container, grid.nextSibling);
         return container;
@@ -294,6 +317,18 @@
     let lastGrid = null;
     let busy = false;
     let currentContainer = null;
+
+    function setDefaultFilter() {
+        const selects = document.querySelectorAll('select');
+        selects.forEach(select => {
+            const option = Array.from(select.options).find(opt => opt.textContent.includes('Containing my phrase'));
+            if (option && select.value !== option.value) {
+                select.value = option.value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                select.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+    }
 
     function check() {
         if (!isBrowsePage()) return;
@@ -308,6 +343,7 @@
             }
             setTimeout(() => { rebuild(); busy = false; }, 500);
         }
+        setDefaultFilter();
     }
 
     check();
@@ -323,7 +359,10 @@
             }
             if (isBrowsePage()) {
                 enableCSS();
-                setTimeout(check, 1000);
+                setTimeout(() => {
+                    check();
+                    setDefaultFilter();
+                }, 1000);
             } else {
                 disableCSS();
             }
