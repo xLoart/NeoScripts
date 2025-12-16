@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TP Beautify
 // @namespace    Loart
-// @version      6.9420.4
+// @version      6.9420.5
 // @description  Unfuck the trading post
 // @author       Loart
 // @match        https://www.neopets.com/island/tradingpost.phtml*
@@ -215,7 +215,8 @@
 
                         setTimeout(() => {
                             if (allItems.length > 0 && currentContainer) {
-                                const visualLot = currentContainer.children[lotData.i];
+                                const paginationOffset = currentContainer.querySelector('.p-4.flex.justify-center') ? 1 : 0;
+                                const visualLot = currentContainer.children[lotData.i + paginationOffset];
                                 if (visualLot) {
                                     const newLot = buildLot(lotData.lot, allItems);
                                     currentContainer.replaceChild(newLot, visualLot);
